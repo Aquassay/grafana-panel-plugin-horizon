@@ -1,8 +1,16 @@
 define([
         'jquery',
+        'lodash',
     ],
-    function($) {
+    function($, _) {
         'use strict';
+
+        var formatValue = function (series, value) {
+            if (!_.isFinite(value)) {
+              value = null; // Prevent NaN formatting
+            }
+            return series.valueFormater(value, series.decimals, series.scaledDecimals);
+        }
 
         function HorizonTooltip(elem, dashboard, scope, getSeriesFn) {
             var self = this;
@@ -162,7 +170,7 @@ define([
                             if (serieIndex === i) {
                                 highlightClass = 'graph-tooltip-list-item--highlight';
                             }
-                            value = series.formatValue(series.data[hoverIndex][1]);
+                            value = formatValue(series, series.data[hoverIndex][1]);
                             timestamp = timestamp || dashboard.formatDate(series.data[hoverIndex][0]);
                             seriesHtml += '<div class="graph-tooltip-list-item ' + highlightClass + '"><div class="graph-tooltip-series-name">';
                             seriesHtml += '<i class="fa fa-minus"></i> ' + series.label + ':</div>';
@@ -187,7 +195,7 @@ define([
                     series = seriesList[serieIndex];
                     if (series) {
                         var hoverInfo = seriesHoverInfo[0];
-                        value = series.formatValue(hoverInfo.value);
+                        value = formatValue(series, hoverInfo.value);
                         self.showTooltip(timestamp, series.label + ': <strong>' + value + '</strong>', pos);
                     }
                 }
